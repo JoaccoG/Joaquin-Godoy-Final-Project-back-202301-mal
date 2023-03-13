@@ -23,6 +23,9 @@
   },
   "homepage": "https://github.com/isdi-coders-2023/Joaquin-Godoy-Final-Project-back-202301-mal#readme",
   "devDependencies": {
+    "@types/bunyan": "^1.8.8",
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
     "@types/jest": "^29.4.0",
     "@types/node": "^18.15.1",
     "@typescript-eslint/eslint-plugin": "^5.54.1",
@@ -37,5 +40,12 @@
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "bunyan": "^1.8.15",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.1"
   }
 }
