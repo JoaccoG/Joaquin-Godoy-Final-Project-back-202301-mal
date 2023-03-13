@@ -2,10 +2,14 @@
   "name": "players-nation-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/server.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install"
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "jest",
+    "prepare": "husky install",
+    "update:git": "git checkout main && git pull && git fetch -p && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs git branch -D && git branch"
   },
   "repository": {
     "type": "git",
