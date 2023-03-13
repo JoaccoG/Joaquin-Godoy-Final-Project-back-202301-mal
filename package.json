@@ -1,0 +1,20 @@
+{
+  "name": "players-nation-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/isdi-coders-2023/Joaquin-Godoy-Final-Project-back-202301-mal.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/isdi-coders-2023/Joaquin-Godoy-Final-Project-back-202301-mal/issues"
+  },
+  "homepage": "https://github.com/isdi-coders-2023/Joaquin-Godoy-Final-Project-back-202301-mal#readme"
+}
