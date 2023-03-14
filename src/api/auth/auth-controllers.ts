@@ -1,8 +1,8 @@
 import { RequestHandler } from 'express';
-import { AuthRequest } from '../../types/models.js';
+import { AuthRequest, LoginResponse } from '../../types/models.js';
 import { User, UserModel } from '../users/users-schema.js';
 import log from '../../logger.js';
-import { encryptPassword } from './auth-utils.js';
+import { encryptPassword, generateJWTToken } from './auth-utils.js';
 
 export const registerController: RequestHandler<
   unknown,
@@ -38,5 +38,34 @@ export const registerController: RequestHandler<
   } catch (err) {
     log.error(err);
     return res.status(500).json({ msg: 'Error creating the new user' });
+  }
+};
+
+export const loginController: RequestHandler<
+  unknown,
+  LoginResponse | { msg: string },
+  AuthRequest
+> = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user: AuthRequest = {
+    email,
+    password: encryptPassword(password),
+  };
+
+  const existingUser = await UserModel.findOne(user).exec();
+
+  if (existingUser === null) {
+    log.debug('User not found');
+    return res.status(404).json({ msg: 'User not found' });
+  }
+
+  try {
+    const userToken = generateJWTToken(email);
+    log.debug('Token generated');
+    return res.status(201).json({ accessToken: userToken });
+  } catch (err) {
+    log.error(err);
+    return res.status(500).json({ msg: 'Error creating the token' });
   }
 };
