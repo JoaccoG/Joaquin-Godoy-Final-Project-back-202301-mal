@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import log from '../logger.js';
 
-export const connectDB = async (urlBD: string) => {
+export const connectDB = (urlBD: string) => {
   try {
     mongoose.set('strictQuery', false);
     mongoose.set('debug', true);
@@ -13,9 +13,8 @@ export const connectDB = async (urlBD: string) => {
       },
     });
 
-    await mongoose.connect(urlBD);
     log.info('Successfully connected to database');
-    return true;
+    return mongoose.connect(urlBD);
   } catch (error) {
     log.error('Error connecting to database');
     throw new Error(`Error: ${error}`);
