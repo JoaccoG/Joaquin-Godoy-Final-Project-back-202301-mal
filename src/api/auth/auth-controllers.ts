@@ -8,7 +8,7 @@ export const registerController: RequestHandler<
   unknown,
   unknown,
   AuthRequest
-> = async (req, res) => {
+> = async (req, res, next) => {
   const { email, password } = req.body;
 
   const existingUser = await UserModel.findOne({ email }).exec();
@@ -36,8 +36,7 @@ export const registerController: RequestHandler<
     log.debug('New user created');
     return res.status(201).json({ msg: 'New user successfully created!' });
   } catch (err) {
-    log.error(err);
-    return res.status(500).json({ msg: 'Error creating the new user' });
+    next(err);
   }
 };
 
@@ -45,27 +44,26 @@ export const loginController: RequestHandler<
   unknown,
   LoginResponse | { msg: string },
   AuthRequest
-> = async (req, res) => {
+> = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user: AuthRequest = {
-    email,
-    password: encryptPassword(password),
-  };
-
-  const existingUser = await UserModel.findOne(user).exec();
-
-  if (existingUser === null) {
-    log.debug('User not found');
-    return res.status(404).json({ msg: 'User not found' });
-  }
-
   try {
+    const user: AuthRequest = {
+      email,
+      password: encryptPassword(password),
+    };
+
+    const existingUser = await UserModel.findOne(user).exec();
+
+    if (existingUser === null) {
+      log.debug('User not found');
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
     const userToken = generateJWTToken(email);
     log.debug('Token generated');
     return res.status(201).json({ accessToken: userToken });
   } catch (err) {
-    log.error(err);
-    return res.status(500).json({ msg: 'Error creating the token' });
+    next(err);
   }
 };

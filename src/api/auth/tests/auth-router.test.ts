@@ -4,9 +4,17 @@ import request from 'supertest';
 import app from '../../../app';
 import { connectDB } from '../../../database/mongodb';
 import { AuthRequest } from '../../../types/models';
+import dotenv from 'dotenv';
+dotenv.config();
 
 describe('Given an app with auth-router', () => {
   let mongoServer: MongoMemoryServer;
+  const OLD_ENV = process.env;
+
+  beforeEach(() => {
+    jest.resetModules();
+    process.env = { ...OLD_ENV };
+  });
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -17,6 +25,7 @@ describe('Given an app with auth-router', () => {
   afterAll(async () => {
     await mongoServer.stop();
     await mongoose.connection.close();
+    process.env = OLD_ENV;
   });
 
   describe('When a user wants to register', () => {
@@ -35,7 +44,7 @@ describe('Given an app with auth-router', () => {
         password: 'password',
       };
 
-      await request(app).post('/auth/register').send(invalidUser).expect(500);
+      await request(app).post('/auth/register').send(invalidUser).expect(400);
     });
 
     test('But the email is already in use, then it should not be able to register', async () => {
@@ -71,6 +80,39 @@ describe('Given an app with auth-router', () => {
         .post('/auth/login')
         .send(notRegisteredUser)
         .expect(404);
+    });
+  });
+
+  describe('But the environment variables are missing or undefined', () => {
+    test('then it should throw an error on encryption algorithm', async () => {
+      delete process.env.PASSWORD_ENCRYPTION_ALGORITHM;
+      const user: AuthRequest = {
+        email: 'user5@email.com',
+        password: 'password',
+      };
+
+      await request(app).post('/auth/register').send(user).expect(500);
+    });
+
+    test('then it should throw an error on encryption key', async () => {
+      delete process.env.PASSWORD_ENCRYPTION_KEY;
+      const user: AuthRequest = {
+        email: 'user5@email.com',
+        password: 'password',
+      };
+
+      await request(app).post('/auth/register').send(user).expect(500);
+    });
+
+    test('then it should throw an error on jwt secret', async () => {
+      delete process.env.JWT_SECRET;
+      const user: AuthRequest = {
+        email: 'user5@email.com',
+        password: 'password',
+      };
+
+      await request(app).post('/auth/register').send(user).expect(201);
+      await request(app).post('/auth/login').send(user).expect(500);
     });
   });
 });
