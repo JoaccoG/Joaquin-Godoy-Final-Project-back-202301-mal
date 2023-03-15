@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import authRouter from './api/auth/auth-router.js';
 import apiRouter from './api/api-router.js';
-import { errorHandler } from './utils/error-handlers.js';
+import { appErrorHandler } from './errors/error-handlers.js';
 
 const app = express();
 
@@ -17,6 +17,6 @@ app.disable('x-powered-by');
 app.use('/auth', authRouter);
 app.use('/api/v1', apiRouter);
 
-app.use(errorHandler);
+app.use(appErrorHandler);
 
 export default app;
