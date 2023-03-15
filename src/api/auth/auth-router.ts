@@ -1,6 +1,6 @@
 import express from 'express';
 import { validate } from 'express-validation';
-import { errorHandler } from '../../utils/error-handlers.js';
+import { errorHandler } from '../../errors/error-handlers.js';
 import { loginController, registerController } from './auth-controllers.js';
 import { authValidation } from './auth-validations.js';
 
