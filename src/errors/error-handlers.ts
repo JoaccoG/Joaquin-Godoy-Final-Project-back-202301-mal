@@ -3,7 +3,7 @@ import { ValidationError } from 'express-validation';
 import log from '../logger.js';
 import { CustomHTTPError } from './custom-http-error.js';
 
-export const errorHandler = (
+export const appErrorHandler = (
   err: Error,
   _req: Request,
   res: Response,
@@ -21,5 +21,5 @@ export const errorHandler = (
   }
 
   log.error(err);
-  return res.status(500).json({ msg: err.message });
+  res.status(500).json({ msg: err.message });
 };
