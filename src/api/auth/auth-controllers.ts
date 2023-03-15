@@ -16,7 +16,7 @@ export const registerController: RequestHandler<
     const existingUser = await UserModel.findOne({ email }).exec();
     if (existingUser !== null) {
       log.error('Email already registered!');
-      throw new CustomHTTPError(404, 'That email is already registered');
+      throw new CustomHTTPError(409, 'That email is already registered');
     }
 
     const newUser: User = {

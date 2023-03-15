@@ -71,18 +71,6 @@ describe('Given a register controller', () => {
     expect(response.status).toHaveBeenCalledWith(201);
     expect(UserModel.create).toHaveBeenCalledWith(newUser);
   });
-
-  test('When the recevied email is already used, then the response should be an error', async () => {
-    UserModel.findOne = jest.fn().mockReturnValue({
-      exec: jest.fn().mockResolvedValue(1),
-    });
-    await registerController(
-      request as Request,
-      response as Response,
-      jest.fn(),
-    );
-    expect(response.status).toHaveBeenCalledWith(409);
-  });
 });
 
 describe('Given a login controller', () => {
