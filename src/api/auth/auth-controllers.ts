@@ -22,9 +22,9 @@ export const registerController: RequestHandler<
     const newUser: User = {
       email,
       password: encryptPassword(password),
-      name: email.split('@')[0],
+      username: email.split('@')[0],
+      name: '',
       surname: '',
-      username: '',
       avatar: '',
       biography: '',
       posts: [],
