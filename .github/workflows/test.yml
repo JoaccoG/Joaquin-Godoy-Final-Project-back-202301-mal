@@ -20,3 +20,5 @@ jobs:
           PASSWORD_ENCRYPTION_ALGORITHM: ${{ secrets.PASSWORD_ENCRYPTION_ALGORITHM }}
           PASSWORD_ENCRYPTION_KEY: ${{ secrets.PASSWORD_ENCRYPTION_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          BUCKET_URL: ${{ secrets.BUCKET_URL }}
+          BUCKET_API_KEY: ${{ secrets.BUCKET_API_KEY }}
