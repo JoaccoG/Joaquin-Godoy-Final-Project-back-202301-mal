@@ -3,6 +3,7 @@ import cors from 'cors';
 import authRouter from './api/auth/auth-router.js';
 import apiRouter from './api/api-router.js';
 import { appErrorHandler } from './errors/error-handlers.js';
+import { authMiddleware } from './api/auth/auth-middleware.js';
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.use(express.json());
 app.disable('x-powered-by');
 
 app.use('/auth', authRouter);
-app.use('/api/v1', apiRouter);
+app.use('/api/v1', authMiddleware, apiRouter);
 
 app.use(appErrorHandler);
 
