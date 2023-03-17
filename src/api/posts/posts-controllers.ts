@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { PROFILE_BUCKET_NAME, supabase } from '../../database/supabase.js';
+import { POSTS_BUCKET_NAME, supabase } from '../../database/supabase.js';
 import { CustomHTTPError } from '../../errors/custom-http-error.js';
 import log from '../../logger.js';
 import { GameModel } from '../games/games-schema.js';
@@ -32,14 +32,14 @@ export const createNewPostController: RequestHandler<
 
     if (fileBuffer !== undefined) {
       const { error } = await supabase.storage
-        .from(PROFILE_BUCKET_NAME)
+        .from(POSTS_BUCKET_NAME)
         .upload(fileName, fileBuffer, {
           upsert: true,
         });
 
       if (error === null) {
         const { data } = await supabase.storage
-          .from(PROFILE_BUCKET_NAME)
+          .from(POSTS_BUCKET_NAME)
           .getPublicUrl(fileName);
 
         newPost = {
