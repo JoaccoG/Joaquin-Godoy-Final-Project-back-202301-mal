@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import jwt from 'jsonwebtoken';
-import { CustomHTTPError } from '../../errors/custom-http-error';
+import { CustomHTTPError } from '../../errors/custom-http-error.js';
 
 export const authMiddleware: RequestHandler = (req, res, next) => {
   const jwtToken = req.headers.authorization?.split(' ')[1];
@@ -20,7 +20,6 @@ export const authMiddleware: RequestHandler = (req, res, next) => {
     process.env.JWT_SECRET,
   ) as jwt.JwtPayload;
 
-  res.locals.email = payload.email;
-
+  res.locals.id = payload.id;
   next();
 };
