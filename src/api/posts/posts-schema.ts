@@ -3,20 +3,21 @@ import { Game } from '../games/games-schema.js';
 import { User } from '../users/users-schema.js';
 
 export interface Post {
-  _id: string;
-  userId: Pick<User, 'username'>;
-  gameId: Pick<Game, 'name'>;
-  opinion: string;
-  rating: number;
+  user: User; // Required
+  game: Game; // Required
+  review: string; // Required
+  rating: number; // Required
+  photo: string;
   likes: number;
   date: Date;
 }
 
 const postSchema = new Schema<Post>({
-  userId: String,
-  gameId: String,
-  opinion: String,
+  user: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  game: [{ type: Schema.Types.ObjectId, ref: 'Game' }],
+  review: String,
   rating: Number,
+  photo: String,
   likes: Number,
   date: Date,
 });
