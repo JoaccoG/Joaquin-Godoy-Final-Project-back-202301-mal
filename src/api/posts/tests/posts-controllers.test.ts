@@ -7,6 +7,32 @@ import {
 } from '../posts-controllers';
 import { Post, PostModel } from '../posts-schema';
 
+jest.mock('@supabase/supabase-js', () => {
+  const data = {
+    publicUrl: 'https://example.com/photo.png',
+  };
+  return {
+    createClient: jest.fn().mockImplementation(() => ({
+      storage: {
+        from: jest.fn().mockReturnValue({
+          upload: jest.fn().mockResolvedValue({
+            error: null,
+            data: {
+              ...data,
+            },
+          }),
+          getPublicUrl: jest.fn().mockReturnValue({
+            error: null,
+            data: {
+              ...data,
+            },
+          }),
+        }),
+      },
+    })),
+  };
+});
+
 describe('Given the posts entity controllers', () => {
   const next = jest.fn();
 
