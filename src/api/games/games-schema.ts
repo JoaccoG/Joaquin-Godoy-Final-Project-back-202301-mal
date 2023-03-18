@@ -1,22 +1,22 @@
 import mongoose, { Schema } from 'mongoose';
-import { Post } from '../posts/posts-schema.js';
+import { Post } from '../posts/posts-schema';
 
 export interface Game {
-  _id: string;
   name: string;
-  photo: string;
+  banner: string;
   description: string;
   tags: string[];
   genre: string;
   mode: 'singleplayer' | 'multiplayer';
   studio: string;
   launch: Date;
-  rating: Pick<Post, 'rating'>;
+  rating: number;
+  posts: Post[];
 }
 
 const gameSchema = new Schema<Game>({
   name: String,
-  photo: String,
+  banner: String,
   description: String,
   tags: [String],
   genre: String,
@@ -24,6 +24,7 @@ const gameSchema = new Schema<Game>({
   studio: String,
   launch: Date,
   rating: Number,
+  posts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
 });
 
 export const GameModel = mongoose.model<Game>('Game', gameSchema, 'games');

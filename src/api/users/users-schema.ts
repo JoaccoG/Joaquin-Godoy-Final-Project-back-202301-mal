@@ -5,9 +5,9 @@ import { Post } from '../posts/posts-schema.js';
 export interface User {
   email: string;
   password: string;
+  username: string;
   name: string;
   surname: string;
-  username: string;
   avatar: string;
   biography: string;
   posts: Post[];
@@ -19,9 +19,9 @@ export interface User {
 const userSchema = new Schema<User>({
   email: String,
   password: String,
+  username: String,
   name: String,
   surname: String,
-  username: String,
   avatar: String,
   biography: String,
   posts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],

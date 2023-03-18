@@ -15,13 +15,11 @@ describe('Given an app with auth-router', () => {
     jest.resetModules();
     process.env = { ...OLD_ENV };
   });
-
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUrl = mongoServer.getUri();
     await connectDB(mongoUrl);
   });
-
   afterAll(async () => {
     await mongoServer.stop();
     await mongoose.connection.close();
@@ -44,7 +42,15 @@ describe('Given an app with auth-router', () => {
         password: 'password',
       };
 
-      await request(app).post('/auth/register').send(invalidUser).expect(400);
+      const response = await request(app)
+        .post('/auth/register')
+        .send(invalidUser)
+        .expect(res => {
+          expect(res.status).toBe(400);
+          expect(res.body).toHaveProperty('msg');
+        });
+
+      await expect(response.body.msg).toEqual('"email" must be a valid email');
     });
 
     test('But the email is already in use, then it should not be able to register', async () => {

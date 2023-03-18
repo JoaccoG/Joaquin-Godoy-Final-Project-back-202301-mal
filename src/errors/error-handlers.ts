@@ -9,17 +9,17 @@ export const appErrorHandler = (
   res: Response,
   _next: NextFunction,
 ) => {
+  log.error(err);
+
   if (err instanceof ValidationError) {
     return res
       .status(err.statusCode)
-      .json({ msg: err.details.body?.[0].message ?? err.message });
+      .json({ msg: err.details.body![0].message });
   }
 
   if (err instanceof CustomHTTPError) {
-    log.error(err);
     return res.status(err.httpCode).json(err.toBodyJSON());
   }
 
-  log.error(err);
   res.status(500).json({ msg: err.message });
 };

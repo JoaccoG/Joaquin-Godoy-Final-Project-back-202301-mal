@@ -31,10 +31,10 @@ export const encryptPassword = (password: string) => {
   return encryptedPassword.toString('hex');
 };
 
-export const generateJWTToken = (email: string) => {
+export const generateJWTToken = (id: string) => {
   if (!process.env.JWT_SECRET) {
     throw new Error('JWT_SECRET environment should be defined');
   }
 
-  return jwt.sign({ email }, process.env.JWT_SECRET);
+  return jwt.sign({ id }, process.env.JWT_SECRET);
 };

@@ -8,9 +8,9 @@ dotenv.config();
 const newUser: User = {
   email: 'mock@email.com',
   password: encryptPassword('mockedPassword'),
-  name: 'mock',
+  username: 'mock',
   surname: '',
-  username: '',
+  name: '',
   avatar: '',
   biography: '',
   posts: [],
