@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { UserLocalsId } from '../../../types/models';
 import { GameModel } from '../../games/games-schema';
 import { UserModel } from '../../users/users-schema';
 import {
@@ -38,16 +39,15 @@ describe('Given the posts entity controllers', () => {
 
   describe('When a request to create a post is made', () => {
     const request = {
-      params: { gameId: 'mockedGameId' },
       body: { review: 'mockedReview', rating: 3 },
       file: { buffer: Buffer.from('mockedBuffer') },
     } as Partial<
       Request<
-        { gameId: string },
         unknown,
-        Pick<Post, 'review' | 'rating' | 'photo'>,
         unknown,
-        { id: string }
+        Pick<Post, 'game' | 'review' | 'rating'>,
+        unknown,
+        UserLocalsId
       >
     >;
     const response = {
@@ -58,6 +58,9 @@ describe('Given the posts entity controllers', () => {
 
     const mockPost = { _id: 'post_id' };
     PostModel.create = jest.fn().mockResolvedValue(mockPost);
+    GameModel.findOne = jest.fn().mockImplementation(() => ({
+      exec: jest.fn().mockResolvedValue({ _id: 'game_id' }),
+    }));
     UserModel.updateOne = jest.fn().mockImplementation(() => ({
       exec: jest.fn().mockResolvedValue({ matchedCount: 1 }),
     }));
@@ -68,11 +71,11 @@ describe('Given the posts entity controllers', () => {
     test('Then the post should be created', async () => {
       await createNewPostController(
         request as Request<
-          { gameId: string },
           unknown,
-          Pick<Post, 'review' | 'rating' | 'photo'>,
           unknown,
-          { id: string }
+          Pick<Post, 'game' | 'review' | 'rating'>,
+          unknown,
+          UserLocalsId
         >,
         response as Response<Post, { id: string }>,
         next,
@@ -86,11 +89,11 @@ describe('Given the posts entity controllers', () => {
       }));
       await createNewPostController(
         request as Request<
-          { gameId: string },
           unknown,
-          Pick<Post, 'review' | 'rating' | 'photo'>,
           unknown,
-          { id: string }
+          Pick<Post, 'game' | 'review' | 'rating'>,
+          unknown,
+          UserLocalsId
         >,
         response as Response<Post, { id: string }>,
         next,
@@ -104,11 +107,29 @@ describe('Given the posts entity controllers', () => {
       }));
       await createNewPostController(
         request as Request<
-          { gameId: string },
           unknown,
-          Pick<Post, 'review' | 'rating' | 'photo'>,
           unknown,
-          { id: string }
+          Pick<Post, 'game' | 'review' | 'rating'>,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<Post, { id: string }>,
+        next,
+      );
+      await expect(next).toHaveBeenCalled();
+    });
+
+    test('But the game about the post is not found, then an error should be thrown', async () => {
+      GameModel.findOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue(null),
+      }));
+      await createNewPostController(
+        request as Request<
+          unknown,
+          unknown,
+          Pick<Post, 'game' | 'review' | 'rating'>,
+          unknown,
+          UserLocalsId
         >,
         response as Response<Post, { id: string }>,
         next,
