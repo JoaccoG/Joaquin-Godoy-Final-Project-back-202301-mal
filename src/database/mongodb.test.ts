@@ -17,7 +17,7 @@ describe('Given a database connection', () => {
   });
 
   describe('When the transform options are defined', () => {
-    it('Then it should delete __v and id from the returned objects', async () => {
+    test('Then it should delete __v and id from the returned objects', async () => {
       const doc = new PostModel({ review: 'Test review', rating: 3 });
       await doc.save();
 
