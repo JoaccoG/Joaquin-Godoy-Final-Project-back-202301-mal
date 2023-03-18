@@ -6,6 +6,6 @@ export interface LoginResponse {
   accessToken: string;
 }
 
-export interface UserQueryId {
-  _id: string;
+export interface UserLocalsId {
+  id: string;
 }
