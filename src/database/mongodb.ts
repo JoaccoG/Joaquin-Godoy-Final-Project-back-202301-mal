@@ -8,6 +8,7 @@ export const connectDB = (urlBD: string) => {
     virtuals: true,
     transform(_doc, ret) {
       delete ret.__v;
+      delete ret.id;
     },
   });
 
