@@ -2,27 +2,45 @@ import { RequestHandler } from 'express';
 import { POSTS_BUCKET_NAME, supabase } from '../../database/supabase.js';
 import { CustomHTTPError } from '../../errors/custom-http-error.js';
 import log from '../../logger.js';
+import { UserLocalsId } from '../../types/models.js';
 import { GameModel } from '../games/games-schema.js';
 import { UserModel } from '../users/users-schema.js';
 import { Post, PostModel } from './posts-schema.js';
 
+export const getAllPostsController: RequestHandler = async (
+  _req,
+  res,
+  next,
+) => {
+  try {
+    const posts = await PostModel.find({}).populate('user game').exec();
+    return res.status(200).json(posts);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const createNewPostController: RequestHandler<
-  { gameId: string },
-  Post,
-  Pick<Post, 'review' | 'rating' | 'photo'>,
   unknown,
-  { id: string }
+  Post,
+  Pick<Post, 'game' | 'review' | 'rating'>,
+  unknown,
+  UserLocalsId
 > = async (req, res, next) => {
   const user = res.locals.id;
-  const { review, rating } = req.body;
-  const { gameId } = req.params;
+  const { game, review, rating } = req.body;
   const fileBuffer = req.file!.buffer;
   const fileName = `PostPhoto-${user}-${Date.now()}.webp`;
 
   try {
+    const gameId = await GameModel.findOne({ name: game }).exec();
+    if (gameId === null) {
+      throw new CustomHTTPError(404, 'Game not found');
+    }
+
     let newPost = {
       user,
-      game: gameId,
+      game: gameId._id,
       review,
       rating,
       photo: '',
@@ -59,7 +77,7 @@ export const createNewPostController: RequestHandler<
     }
 
     const gameRes = await GameModel.updateOne(
-      { _id: gameId },
+      { _id: gameId._id },
       { $push: { posts: post._id } },
     ).exec();
     if (gameRes.matchedCount === 0) {
@@ -68,19 +86,6 @@ export const createNewPostController: RequestHandler<
 
     log.info('New post successfully created');
     return res.status(201).json(post);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const getAllPostsController: RequestHandler = async (
-  _req,
-  res,
-  next,
-) => {
-  try {
-    const posts = await PostModel.find({}).populate('user game').exec();
-    return res.status(200).json(posts);
   } catch (err) {
     next(err);
   }
