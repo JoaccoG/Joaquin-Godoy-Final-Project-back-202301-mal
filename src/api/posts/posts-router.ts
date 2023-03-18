@@ -7,7 +7,7 @@ import uploadGameImg from './posts-img-middleware.js';
 
 export const postsRouter = express.Router();
 
-postsRouter.route('/').get(getAllPostsController);
 postsRouter
-  .route('/:gameId')
+  .route('/')
+  .get(getAllPostsController)
   .post(uploadGameImg.single('photo'), createNewPostController);
