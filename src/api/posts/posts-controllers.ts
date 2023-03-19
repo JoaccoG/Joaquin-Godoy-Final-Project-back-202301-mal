@@ -27,15 +27,15 @@ export const createNewPostController: RequestHandler<
   unknown,
   UserLocalsId
 > = async (req, res, next) => {
-  const user = res.locals.id;
   const { game, review, rating } = req.body;
+  const user = res.locals.id;
   const fileBuffer = req.file!.buffer;
   const fileName = `PostPhoto-${user}-${Date.now()}.webp`;
 
   try {
     const gameId = await GameModel.findOne({ name: game }).exec();
     if (gameId === null) {
-      throw new CustomHTTPError(404, 'Game not found');
+      throw new CustomHTTPError(404, 'Game to rate not found');
     }
 
     let newPost = {
@@ -73,7 +73,7 @@ export const createNewPostController: RequestHandler<
       { $push: { posts: post._id } },
     ).exec();
     if (userRes.matchedCount === 0) {
-      throw new CustomHTTPError(404, 'User not found');
+      throw new CustomHTTPError(404, 'User to update not found');
     }
 
     const gameRes = await GameModel.updateOne(
@@ -81,7 +81,7 @@ export const createNewPostController: RequestHandler<
       { $push: { posts: post._id } },
     ).exec();
     if (gameRes.matchedCount === 0) {
-      throw new CustomHTTPError(404, 'Game not found');
+      throw new CustomHTTPError(404, 'Game to update not found');
     }
 
     log.info('New post successfully created');
