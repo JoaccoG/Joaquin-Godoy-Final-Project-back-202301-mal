@@ -8,14 +8,15 @@ import bodyParser from 'body-parser';
 
 const app = express();
 
-app.get('/', (_req, res) => {
-  res.json('Server ON');
-});
-
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.disable('x-powered-by');
+
+app.get('/', (_req, res) => {
+  res.json('Server ON');
+});
 
 app.use('/auth', authRouter);
 app.use('/api/v1', authMiddleware, apiRouter);
