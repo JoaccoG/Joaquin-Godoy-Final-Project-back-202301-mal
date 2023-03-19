@@ -29,7 +29,7 @@ export const createNewPostController: RequestHandler<
 > = async (req, res, next) => {
   const { game, review, rating } = req.body;
   const user = res.locals.id;
-  const fileBuffer = req.file!.buffer;
+  const fileBuffer = req.file?.buffer;
   const fileName = `PostPhoto-${user}-${Date.now()}.webp`;
 
   try {
