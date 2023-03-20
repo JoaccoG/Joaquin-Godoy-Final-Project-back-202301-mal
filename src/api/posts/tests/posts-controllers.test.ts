@@ -136,6 +136,33 @@ describe('Given the posts entity controllers', () => {
       );
       await expect(next).toHaveBeenCalled();
     });
+
+    test('But no file on buffer is found, then the post should be created with no photo', async () => {
+      const noBufferRequest = {
+        body: { review: 'mockedReview', rating: 3 },
+        file: undefined,
+      } as Partial<
+        Request<
+          unknown,
+          unknown,
+          Pick<Post, 'game' | 'review' | 'rating'>,
+          unknown,
+          UserLocalsId
+        >
+      >;
+      await createNewPostController(
+        noBufferRequest as Request<
+          unknown,
+          unknown,
+          Pick<Post, 'game' | 'review' | 'rating'>,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<Post, { id: string }>,
+        next,
+      );
+      await expect(response.status).toHaveBeenCalledWith(201);
+    });
   });
   describe('When a request to get a post is made', () => {
     const request = {} as Request;
