@@ -7,14 +7,26 @@ import { GameModel } from '../games/games-schema.js';
 import { UserModel } from '../users/users-schema.js';
 import { Post, PostModel } from './posts-schema.js';
 
-export const getAllPostsController: RequestHandler = async (
-  _req,
-  res,
-  next,
-) => {
+export const getAllPostsController: RequestHandler<
+  unknown,
+  unknown,
+  unknown,
+  {
+    offset: number;
+    limit: number;
+  }
+> = async (req, res, next) => {
+  const { offset, limit } = req.query;
+
   try {
-    const posts = await PostModel.find({}).populate('user game').exec();
-    posts.sort((a, b) => b.date - a.date);
+    const posts = await PostModel.find({})
+      .sort({ date: -1 })
+      .limit(limit)
+      .skip(offset)
+      .populate({ path: 'user', select: 'username name surname' })
+      .populate({ path: 'game', select: 'name banner' })
+      .exec();
+
     return res.status(200).json({ msg: 'Successfully fetched posts!', posts });
   } catch (err) {
     next(err);
