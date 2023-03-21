@@ -166,8 +166,12 @@ describe('Given the posts entity controllers', () => {
       await expect(response.status).toHaveBeenCalledWith(201);
     });
   });
-  describe('When a request to get a post is made', () => {
-    const request = {} as Request;
+  describe('When a request to get posts is made', () => {
+    const request = {
+      query: { offset: 0, limit: 3 },
+    } as Partial<
+      Request<unknown, unknown, unknown, { offset: number; limit: number }>
+    >;
     const response = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -176,20 +180,44 @@ describe('Given the posts entity controllers', () => {
     test('Then the response should be the list of posts', async () => {
       const mockPosts = [{ _id: 'post1' }, { _id: 'post2' }];
       PostModel.find = jest.fn().mockReturnValue({
+        sort: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
         populate: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue(mockPosts),
       });
-      await getAllPostsController(request, response as Response, next);
+      await getAllPostsController(
+        request as Request<
+          unknown,
+          unknown,
+          unknown,
+          { offset: number; limit: number }
+        >,
+        response as Response,
+        next,
+      );
       await expect(response.status).toHaveBeenCalledWith(200);
     });
 
     test('But there is an error while finding the posts, then an error should be thrown', async () => {
       const mockPosts = [{ _id: 'post1' }, { _id: 'post2' }];
       PostModel.find = jest.fn().mockReturnValue({
+        sort: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
         populate: jest.fn().mockReturnThis(),
         exec: jest.fn().mockRejectedValue(mockPosts),
       });
-      await getAllPostsController(request, response as Response, next);
+      await getAllPostsController(
+        request as Request<
+          unknown,
+          unknown,
+          unknown,
+          { offset: number; limit: number }
+        >,
+        response as Response,
+        next,
+      );
       await expect(next).toHaveBeenCalled();
     });
   });
