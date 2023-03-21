@@ -15,7 +15,7 @@ export const getAllPostsController: RequestHandler = async (
   try {
     const posts = await PostModel.find({}).populate('user game').exec();
     posts.sort((a, b) => b.date - a.date);
-    return res.status(200).json(posts);
+    return res.status(200).json({ msg: 'Successfully fetched posts!', posts });
   } catch (err) {
     next(err);
   }
