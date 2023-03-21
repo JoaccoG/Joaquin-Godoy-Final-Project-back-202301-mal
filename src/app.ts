@@ -19,7 +19,7 @@ app.get('/', (_req, res) => {
 });
 
 app.use('/auth', authRouter);
-app.use('/auth/validate', authMiddleware, (_req, res) => {
+app.get('/token-validation', authMiddleware, (_req, res) => {
   res.status(200).json({ msg: 'Validated' });
 });
 
