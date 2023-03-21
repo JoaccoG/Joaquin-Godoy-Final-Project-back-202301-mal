@@ -23,7 +23,7 @@ export const getAllPostsController: RequestHandler<
       .sort({ date: -1 })
       .limit(limit)
       .skip(offset)
-      .populate({ path: 'user', select: 'username name surname' })
+      .populate({ path: 'user', select: 'username name surname avatar' })
       .populate({ path: 'game', select: 'name banner' })
       .exec();
 
