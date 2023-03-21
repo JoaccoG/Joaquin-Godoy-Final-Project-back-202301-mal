@@ -19,6 +19,10 @@ app.get('/', (_req, res) => {
 });
 
 app.use('/auth', authRouter);
+app.use('/auth/validate', authMiddleware, (_req, res) => {
+  res.status(200).json({ msg: 'Validated' });
+});
+
 app.use('/api/v1', authMiddleware, apiRouter);
 
 app.use(appErrorHandler);
