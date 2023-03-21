@@ -8,7 +8,6 @@ export interface Post {
   review: string;
   rating: number;
   photo: string;
-  likes: number;
   date: number;
 }
 
@@ -18,7 +17,6 @@ const postSchema = new Schema<Post>({
   review: String,
   rating: Number,
   photo: String,
-  likes: Number,
   date: Number,
 });
 

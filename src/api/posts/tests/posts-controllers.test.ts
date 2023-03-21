@@ -57,7 +57,9 @@ describe('Given the posts entity controllers', () => {
     } as Partial<Response>;
 
     const mockPost = { _id: 'post_id' };
-    PostModel.create = jest.fn().mockResolvedValue(mockPost);
+    PostModel.create = jest.fn().mockImplementation(() => ({
+      populate: jest.fn().mockResolvedValue(mockPost),
+    }));
     GameModel.findOne = jest.fn().mockImplementation(() => ({
       exec: jest.fn().mockResolvedValue({ _id: 'game_id' }),
     }));
@@ -77,7 +79,7 @@ describe('Given the posts entity controllers', () => {
           unknown,
           UserLocalsId
         >,
-        response as Response<Post, { id: string }>,
+        response as Response<{ msg: string; post: Post }, { id: string }>,
         next,
       );
       await expect(response.status).toHaveBeenCalledWith(201);
@@ -95,7 +97,7 @@ describe('Given the posts entity controllers', () => {
           unknown,
           UserLocalsId
         >,
-        response as Response<Post, { id: string }>,
+        response as Response<{ msg: string; post: Post }, { id: string }>,
         next,
       );
       await expect(next).toHaveBeenCalled();
@@ -113,7 +115,7 @@ describe('Given the posts entity controllers', () => {
           unknown,
           UserLocalsId
         >,
-        response as Response<Post, { id: string }>,
+        response as Response<{ msg: string; post: Post }, { id: string }>,
         next,
       );
       await expect(next).toHaveBeenCalled();
@@ -131,7 +133,7 @@ describe('Given the posts entity controllers', () => {
           unknown,
           UserLocalsId
         >,
-        response as Response<Post, { id: string }>,
+        response as Response<{ msg: string; post: Post }, { id: string }>,
         next,
       );
       await expect(next).toHaveBeenCalled();
@@ -158,7 +160,7 @@ describe('Given the posts entity controllers', () => {
           unknown,
           UserLocalsId
         >,
-        response as Response<Post, { id: string }>,
+        response as Response<{ msg: string; post: Post }, { id: string }>,
         next,
       );
       await expect(response.status).toHaveBeenCalledWith(201);

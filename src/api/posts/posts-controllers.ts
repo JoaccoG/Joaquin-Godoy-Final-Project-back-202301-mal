@@ -14,6 +14,7 @@ export const getAllPostsController: RequestHandler = async (
 ) => {
   try {
     const posts = await PostModel.find({}).populate('user game').exec();
+    posts.sort((a, b) => b.date - a.date);
     return res.status(200).json(posts);
   } catch (err) {
     next(err);
@@ -22,7 +23,7 @@ export const getAllPostsController: RequestHandler = async (
 
 export const createNewPostController: RequestHandler<
   unknown,
-  Post,
+  { msg: string; post: Post },
   Pick<Post, 'game' | 'review' | 'rating'>,
   unknown,
   UserLocalsId
@@ -44,7 +45,6 @@ export const createNewPostController: RequestHandler<
       review,
       rating,
       photo: '',
-      likes: 0,
       date: Date.now(),
     };
 
@@ -67,7 +67,7 @@ export const createNewPostController: RequestHandler<
       }
     }
 
-    const post = await PostModel.create(newPost);
+    const post = await (await PostModel.create(newPost)).populate('user game');
     const userRes = await UserModel.updateOne(
       { _id: user },
       { $push: { posts: post._id } },
@@ -85,7 +85,7 @@ export const createNewPostController: RequestHandler<
     }
 
     log.info('New post successfully created');
-    return res.status(201).json(post);
+    return res.status(201).json({ msg: 'New post created!', post });
   } catch (err) {
     next(err);
   }

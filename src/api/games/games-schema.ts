@@ -6,7 +6,6 @@ export interface Game {
   banner: string;
   description: string;
   tags: string[];
-  genre: string;
   mode: 'singleplayer' | 'multiplayer';
   studio: string;
   launch: Date;
@@ -19,7 +18,6 @@ const gameSchema = new Schema<Game>({
   banner: String,
   description: String,
   tags: [String],
-  genre: String,
   mode: String,
   studio: String,
   launch: Date,
