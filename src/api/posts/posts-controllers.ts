@@ -19,6 +19,8 @@ export const getAllPostsController: RequestHandler<
   const { offset, limit } = req.query;
 
   try {
+    const postsCount = await PostModel.countDocuments().exec();
+
     const posts = await PostModel.find({})
       .sort({ date: -1 })
       .limit(limit)
@@ -27,7 +29,9 @@ export const getAllPostsController: RequestHandler<
       .populate({ path: 'game', select: 'name banner' })
       .exec();
 
-    return res.status(200).json({ msg: 'Successfully fetched posts!', posts });
+    return res
+      .status(200)
+      .json({ msg: 'Successfully fetched posts!', count: postsCount, posts });
   } catch (err) {
     next(err);
   }

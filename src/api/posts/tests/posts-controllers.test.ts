@@ -186,6 +186,9 @@ describe('Given the posts entity controllers', () => {
         populate: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue(mockPosts),
       });
+      PostModel.countDocuments = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue(2),
+      }));
       await getAllPostsController(
         request as Request<
           unknown,
@@ -208,6 +211,9 @@ describe('Given the posts entity controllers', () => {
         populate: jest.fn().mockReturnThis(),
         exec: jest.fn().mockRejectedValue(mockPosts),
       });
+      PostModel.countDocuments = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockRejectedValue(2),
+      }));
       await getAllPostsController(
         request as Request<
           unknown,
