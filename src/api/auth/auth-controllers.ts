@@ -61,7 +61,10 @@ export const loginController: RequestHandler<
 
     const userToken = generateJWTToken(existingUser._id.toString());
     log.info('JWT User Token generated.');
-    return res.status(201).json({ accessToken: userToken });
+    return res.status(201).json({
+      accessToken: userToken,
+      user: existingUser._id.toString(),
+    });
   } catch (err) {
     next(err);
   }
