@@ -101,7 +101,53 @@ export const createNewPostController: RequestHandler<
     }
 
     log.info('New post successfully created');
-    return res.status(201).json({ msg: 'New post created!', post });
+    return res.status(201).json({ msg: 'New post successfully created', post });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deletePostController: RequestHandler<
+  { idPost: string },
+  unknown,
+  { game: string },
+  unknown,
+  UserLocalsId
+> = async (req, res, next) => {
+  const user = res.locals.id;
+  const post = req.params.idPost;
+  const { game } = req.body;
+
+  try {
+    const userRes = await UserModel.updateOne(
+      { _id: user },
+      { $pull: { posts: post } },
+    ).exec();
+    if (userRes.matchedCount === 0) {
+      throw new CustomHTTPError(
+        404,
+        'Error while trying to delete post from user posts',
+      );
+    }
+
+    const gameRes = await GameModel.updateOne(
+      { _id: game },
+      { $pull: { posts: post } },
+    ).exec();
+    if (gameRes.matchedCount === 0) {
+      throw new CustomHTTPError(
+        404,
+        'Error while trying to delete post from game posts',
+      );
+    }
+
+    const postRes = await PostModel.deleteOne({ _id: post }).exec();
+    if (postRes.deletedCount !== 1) {
+      throw new CustomHTTPError(404, 'Error while trying to delete post');
+    }
+
+    log.info('Post successfully deleted');
+    return res.status(200).json({ msg: 'Post successfully deleted', post });
   } catch (err) {
     next(err);
   }
