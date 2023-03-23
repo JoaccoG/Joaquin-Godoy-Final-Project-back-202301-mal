@@ -4,6 +4,7 @@ export type AuthRequest = Pick<User, 'email' | 'password'>;
 
 export interface LoginResponse {
   accessToken: string;
+  user: string;
 }
 
 export interface UserLocalsId {
