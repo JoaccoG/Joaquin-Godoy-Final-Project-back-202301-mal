@@ -110,24 +110,38 @@ export const createNewPostController: RequestHandler<
 export const deletePostController: RequestHandler<
   { idPost: string },
   unknown,
-  { game: string },
+  unknown,
   unknown,
   UserLocalsId
 > = async (req, res, next) => {
-  const user = res.locals.id;
   const post = req.params.idPost;
-  const { game } = req.body;
+  const user = res.locals.id;
 
   try {
+    const postToDelete = await PostModel.findOne({ _id: post }).exec();
+    if (postToDelete === null) {
+      throw new CustomHTTPError(404, 'Post to delete not found');
+    }
+
+    if (postToDelete.user.toString() !== user) {
+      throw new CustomHTTPError(403, 'Not authorized to delete post');
+    }
+
+    const { game, photo } = postToDelete;
+
+    if (photo) {
+      const file = photo.substring(photo.lastIndexOf('/') + 1);
+      await supabase.storage.from(POSTS_BUCKET_NAME).remove([file]);
+
+      log.info('Post photo successfully deleted');
+    }
+
     const userRes = await UserModel.updateOne(
       { _id: user },
       { $pull: { posts: post } },
     ).exec();
     if (userRes.matchedCount === 0) {
-      throw new CustomHTTPError(
-        404,
-        'Error while trying to delete post from user posts',
-      );
+      throw new CustomHTTPError(404, 'User of the post not found');
     }
 
     const gameRes = await GameModel.updateOne(
@@ -135,15 +149,12 @@ export const deletePostController: RequestHandler<
       { $pull: { posts: post } },
     ).exec();
     if (gameRes.matchedCount === 0) {
-      throw new CustomHTTPError(
-        404,
-        'Error while trying to delete post from game posts',
-      );
+      throw new CustomHTTPError(404, 'Game of the post not found');
     }
 
     const postRes = await PostModel.deleteOne({ _id: post }).exec();
     if (postRes.deletedCount !== 1) {
-      throw new CustomHTTPError(404, 'Error while trying to delete post');
+      throw new CustomHTTPError(500, 'Error while trying to delete post');
     }
 
     log.info('Post successfully deleted');
