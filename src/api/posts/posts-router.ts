@@ -13,4 +13,4 @@ postsRouter
   .get(getAllPostsController)
   .post(upload.single('photo'), createNewPostController);
 
-postsRouter.route('/:id').delete(deletePostController);
+postsRouter.route('/:idPost').delete(deletePostController);
