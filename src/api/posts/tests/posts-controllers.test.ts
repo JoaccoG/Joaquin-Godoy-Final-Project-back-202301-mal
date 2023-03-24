@@ -1,12 +1,15 @@
 import { Request, Response } from 'express';
 import { UserLocalsId } from '../../../types/models';
 import { GameModel } from '../../games/games-schema';
-import { UserModel } from '../../users/users-schema';
 import {
   createNewPostController,
+  deletePostController,
   getAllPostsController,
 } from '../posts-controllers';
 import { Post, PostModel } from '../posts-schema';
+import { UserModel } from '../../users/users-schema';
+import { mockedPosts } from './utils';
+import { CustomHTTPError } from '../../../errors/custom-http-error';
 
 jest.mock('@supabase/supabase-js', () => {
   const data = {
@@ -28,16 +31,24 @@ jest.mock('@supabase/supabase-js', () => {
               ...data,
             },
           }),
+          remove: jest.fn().mockResolvedValue({
+            error: null,
+            data: {},
+          }),
         }),
       },
     })),
   };
 });
 
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
 describe('Given the posts entity controllers', () => {
   const next = jest.fn();
 
-  describe('When a request to create a post is made', () => {
+  describe('When a request to create a new post is made', () => {
     const request = {
       body: { review: 'mockedReview', rating: 3 },
       file: { buffer: Buffer.from('mockedBuffer') },
@@ -55,10 +66,8 @@ describe('Given the posts entity controllers', () => {
       json: jest.fn(),
       locals: { id: 'mockedId' },
     } as Partial<Response>;
-
-    const mockPost = { _id: 'post_id' };
     PostModel.create = jest.fn().mockImplementation(() => ({
-      populate: jest.fn().mockResolvedValue(mockPost),
+      populate: jest.fn().mockResolvedValue(mockedPosts[0]),
     }));
     GameModel.findOne = jest.fn().mockImplementation(() => ({
       exec: jest.fn().mockResolvedValue({ _id: 'game_id' }),
@@ -83,60 +92,6 @@ describe('Given the posts entity controllers', () => {
         next,
       );
       await expect(response.status).toHaveBeenCalledWith(201);
-    });
-
-    test('But the post-related game is not found, then an error should be thrown', async () => {
-      GameModel.updateOne = jest.fn().mockImplementation(() => ({
-        exec: jest.fn().mockResolvedValue({ matchedCount: 0 }),
-      }));
-      await createNewPostController(
-        request as Request<
-          unknown,
-          unknown,
-          Pick<Post, 'game' | 'review' | 'rating'>,
-          unknown,
-          UserLocalsId
-        >,
-        response as Response<{ msg: string; post: Post }, { id: string }>,
-        next,
-      );
-      await expect(next).toHaveBeenCalled();
-    });
-
-    test('But the post-related user is not found, then an error should be thrown', async () => {
-      UserModel.updateOne = jest.fn().mockImplementation(() => ({
-        exec: jest.fn().mockResolvedValue({ matchedCount: 0 }),
-      }));
-      await createNewPostController(
-        request as Request<
-          unknown,
-          unknown,
-          Pick<Post, 'game' | 'review' | 'rating'>,
-          unknown,
-          UserLocalsId
-        >,
-        response as Response<{ msg: string; post: Post }, { id: string }>,
-        next,
-      );
-      await expect(next).toHaveBeenCalled();
-    });
-
-    test('But the game about the post is not found, then an error should be thrown', async () => {
-      GameModel.findOne = jest.fn().mockImplementation(() => ({
-        exec: jest.fn().mockResolvedValue(null),
-      }));
-      await createNewPostController(
-        request as Request<
-          unknown,
-          unknown,
-          Pick<Post, 'game' | 'review' | 'rating'>,
-          unknown,
-          UserLocalsId
-        >,
-        response as Response<{ msg: string; post: Post }, { id: string }>,
-        next,
-      );
-      await expect(next).toHaveBeenCalled();
     });
 
     test('But no file on buffer is found, then the post should be created with no photo', async () => {
@@ -165,7 +120,68 @@ describe('Given the posts entity controllers', () => {
       );
       await expect(response.status).toHaveBeenCalledWith(201);
     });
+
+    test('But the post-related game is not found, then an error should be thrown', async () => {
+      GameModel.updateOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue({ matchedCount: 0 }),
+      }));
+      await createNewPostController(
+        request as Request<
+          unknown,
+          unknown,
+          Pick<Post, 'game' | 'review' | 'rating'>,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<{ msg: string; post: Post }, { id: string }>,
+        next,
+      );
+      await expect(next).toHaveBeenCalledWith(
+        new CustomHTTPError(404, 'Game to update not found'),
+      );
+    });
+
+    test('But the post-related user is not found, then an error should be thrown', async () => {
+      UserModel.updateOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue({ matchedCount: 0 }),
+      }));
+      await createNewPostController(
+        request as Request<
+          unknown,
+          unknown,
+          Pick<Post, 'game' | 'review' | 'rating'>,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<{ msg: string; post: Post }, { id: string }>,
+        next,
+      );
+      await expect(next).toHaveBeenCalledWith(
+        new CustomHTTPError(404, 'User to update not found'),
+      );
+    });
+
+    test('But the game about the post is not found, then an error should be thrown', async () => {
+      GameModel.findOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue(null),
+      }));
+      await createNewPostController(
+        request as Request<
+          unknown,
+          unknown,
+          Pick<Post, 'game' | 'review' | 'rating'>,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<{ msg: string; post: Post }, { id: string }>,
+        next,
+      );
+      await expect(next).toHaveBeenCalledWith(
+        new CustomHTTPError(404, 'Game to rate not found'),
+      );
+    });
   });
+
   describe('When a request to get posts is made', () => {
     const request = {
       query: { offset: 0, limit: 3 },
@@ -176,19 +192,18 @@ describe('Given the posts entity controllers', () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     } as Partial<Response>;
+    PostModel.find = jest.fn().mockReturnValue({
+      sort: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      populate: jest.fn().mockReturnThis(),
+      exec: jest.fn().mockResolvedValue(mockedPosts),
+    });
+    PostModel.countDocuments = jest.fn().mockImplementation(() => ({
+      exec: jest.fn().mockResolvedValue(2),
+    }));
 
-    test('Then the response should be the list of posts', async () => {
-      const mockPosts = [{ _id: 'post1' }, { _id: 'post2' }];
-      PostModel.find = jest.fn().mockReturnValue({
-        sort: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        populate: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue(mockPosts),
-      });
-      PostModel.countDocuments = jest.fn().mockImplementation(() => ({
-        exec: jest.fn().mockResolvedValue(2),
-      }));
+    test('Then the response should contain a list of posts', async () => {
       await getAllPostsController(
         request as Request<
           unknown,
@@ -199,21 +214,15 @@ describe('Given the posts entity controllers', () => {
         response as Response,
         next,
       );
+
       await expect(response.status).toHaveBeenCalledWith(200);
     });
 
     test('But there is an error while finding the posts, then an error should be thrown', async () => {
-      const mockPosts = [{ _id: 'post1' }, { _id: 'post2' }];
       PostModel.find = jest.fn().mockReturnValue({
-        sort: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        skip: jest.fn().mockReturnThis(),
-        populate: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockRejectedValue(mockPosts),
+        exec: jest.fn().mockRejectedValue(new Error('mockedError')),
       });
-      PostModel.countDocuments = jest.fn().mockImplementation(() => ({
-        exec: jest.fn().mockRejectedValue(2),
-      }));
+
       await getAllPostsController(
         request as Request<
           unknown,
@@ -224,6 +233,143 @@ describe('Given the posts entity controllers', () => {
         response as Response,
         next,
       );
+
+      await expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe('When a request to delete a post is made', () => {
+    const request = {
+      params: { idPost: 'post_id' },
+    } as Partial<
+      Request<{ idPost: string }, unknown, unknown, unknown, UserLocalsId>
+    >;
+    const response = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+      locals: { id: 'user_id1' },
+    } as Partial<Response>;
+    PostModel.findOne = jest.fn().mockImplementation(() => ({
+      exec: jest.fn().mockResolvedValue(mockedPosts[0]),
+    }));
+
+    test('Then the post should be deleted', async () => {
+      UserModel.updateOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue({ matchedCount: 1 }),
+      }));
+      GameModel.updateOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue({ matchedCount: 1 }),
+      }));
+      PostModel.deleteOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue({ deletedCount: 1 }),
+      }));
+      await deletePostController(
+        request as Request<
+          { idPost: string },
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<unknown, UserLocalsId>,
+        next,
+      );
+
+      await expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('But there is an error while deleting the post, then an error should be thrown', async () => {
+      PostModel.deleteOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue({ deletedCount: 0 }),
+      }));
+      await deletePostController(
+        request as Request<
+          { idPost: string },
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<unknown, UserLocalsId>,
+        next,
+      );
+
+      await expect(next).toHaveBeenCalled();
+    });
+
+    test('But no game related to the post is found, then an error should be thrown', async () => {
+      GameModel.updateOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue({ matchedCount: 0 }),
+      }));
+      await deletePostController(
+        request as Request<
+          { idPost: string },
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<unknown, UserLocalsId>,
+        next,
+      );
+
+      await expect(next).toHaveBeenCalled();
+    });
+
+    test('But no user related to the post is found, then an error should be thrown', async () => {
+      UserModel.updateOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue({ matchedCount: 0 }),
+      }));
+      await deletePostController(
+        request as Request<
+          { idPost: string },
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<unknown, UserLocalsId>,
+        next,
+      );
+
+      await expect(next).toHaveBeenCalled();
+    });
+
+    test('But the post to delete is not found, then an error should be thrown', async () => {
+      PostModel.findOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue(null),
+      }));
+      await deletePostController(
+        request as Request<
+          { idPost: string },
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<unknown, UserLocalsId>,
+        next,
+      );
+
+      await expect(next).toHaveBeenCalled();
+    });
+
+    test('But the request is being made by someone else than the post creator, then an error should be thrown', async () => {
+      PostModel.findOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue(mockedPosts[1]),
+      }));
+      await deletePostController(
+        request as Request<
+          { idPost: string },
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<unknown, UserLocalsId>,
+        next,
+      );
+
       await expect(next).toHaveBeenCalled();
     });
   });
