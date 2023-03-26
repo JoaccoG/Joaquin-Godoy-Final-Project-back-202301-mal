@@ -24,8 +24,10 @@ export const registerController: RequestHandler<
       username: email.split('@')[0],
       name: '',
       surname: '',
-      avatar: '',
-      biography: '',
+      avatar:
+        'https://qbrnwvzyvxvymfaakhqt.supabase.co/storage/v1/object/public/users/avatar-1.webp',
+      biography:
+        'I am a new user! You can change this biography in your profile.',
       posts: [],
       followers: [],
       following: [],
