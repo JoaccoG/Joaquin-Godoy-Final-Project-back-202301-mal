@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { UserLocalsId } from '../../../types/models';
+import { RequestQueryOffsetLimit, UserLocalsId } from '../../../types/models';
 import { GameModel } from '../../games/games-schema';
 import {
   createNewPostController,
@@ -185,9 +185,7 @@ describe('Given the posts entity controllers', () => {
   describe('When a request to get posts is made', () => {
     const request = {
       query: { offset: 0, limit: 3 },
-    } as Partial<
-      Request<unknown, unknown, unknown, { offset: number; limit: number }>
-    >;
+    } as Partial<Request<unknown, unknown, unknown, RequestQueryOffsetLimit>>;
     const response = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -205,12 +203,7 @@ describe('Given the posts entity controllers', () => {
 
     test('Then the response should contain a list of posts', async () => {
       await getAllPostsController(
-        request as Request<
-          unknown,
-          unknown,
-          unknown,
-          { offset: number; limit: number }
-        >,
+        request as Request<unknown, unknown, unknown, RequestQueryOffsetLimit>,
         response as Response,
         next,
       );
@@ -224,12 +217,7 @@ describe('Given the posts entity controllers', () => {
       });
 
       await getAllPostsController(
-        request as Request<
-          unknown,
-          unknown,
-          unknown,
-          { offset: number; limit: number }
-        >,
+        request as Request<unknown, unknown, unknown, RequestQueryOffsetLimit>,
         response as Response,
         next,
       );
