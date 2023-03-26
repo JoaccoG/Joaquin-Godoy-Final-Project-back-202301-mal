@@ -1,9 +1,15 @@
 import { RequestHandler } from 'express';
 import { CustomHTTPError } from '../../errors/custom-http-error.js';
+import {
+  RequestParamsUserId,
+  RequestQueryOffsetLimit,
+} from '../../types/models.js';
 import { PostModel } from '../posts/posts-schema.js';
 import { UserModel } from './users-schema.js';
 
-export const getUserByIdController: RequestHandler = async (req, res, next) => {
+export const getUserByIdController: RequestHandler<
+  RequestParamsUserId
+> = async (req, res, next) => {
   const user = req.params.idUser;
 
   try {
@@ -38,13 +44,10 @@ export const getUserByIdController: RequestHandler = async (req, res, next) => {
 };
 
 export const getUserPostsByIdController: RequestHandler<
-  { idUser: string },
+  RequestParamsUserId,
   unknown,
   unknown,
-  {
-    offset: number;
-    limit: number;
-  }
+  RequestQueryOffsetLimit
 > = async (req, res, next) => {
   const { idUser } = req.params;
   const { offset, limit } = req.query;
