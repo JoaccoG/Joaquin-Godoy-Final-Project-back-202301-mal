@@ -10,3 +10,12 @@ export interface LoginResponse {
 export interface UserLocalsId {
   id: string;
 }
+
+export interface RequestParamsUserId {
+  idUser: string;
+}
+
+export interface RequestQueryOffsetLimit {
+  offset: number;
+  limit: number;
+}
