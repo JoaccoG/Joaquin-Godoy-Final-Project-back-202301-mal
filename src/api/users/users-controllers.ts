@@ -62,6 +62,9 @@ export const getUserPostsByIdController: RequestHandler<
       .populate({ path: 'user', select: 'username name surname avatar' })
       .populate({ path: 'game', select: 'name banner' })
       .exec();
+    if (posts === null) {
+      throw new CustomHTTPError(404, 'User posts not found');
+    }
 
     return res
       .status(200)
