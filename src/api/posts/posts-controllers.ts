@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 import { POSTS_BUCKET_NAME, supabase } from '../../database/supabase.js';
 import { CustomHTTPError } from '../../errors/custom-http-error.js';
 import log from '../../logger.js';
-import { UserLocalsId } from '../../types/models.js';
+import { RequestQueryOffsetLimit, UserLocalsId } from '../../types/models.js';
 import { GameModel } from '../games/games-schema.js';
 import { UserModel } from '../users/users-schema.js';
 import { Post, PostModel } from './posts-schema.js';
@@ -11,10 +11,7 @@ export const getAllPostsController: RequestHandler<
   unknown,
   unknown,
   unknown,
-  {
-    offset: number;
-    limit: number;
-  }
+  RequestQueryOffsetLimit
 > = async (req, res, next) => {
   const { offset, limit } = req.query;
 
