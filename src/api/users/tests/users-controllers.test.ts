@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { UserModel } from '../users-schema';
 import { mockedUsers } from './utils';
 import {
+  addFollowerController,
   getUserByIdController,
   getUserPostsByIdController,
 } from '../users-controllers';
@@ -151,6 +152,128 @@ describe('Given the users entity controllers', () => {
       );
       await expect(next).toHaveBeenCalledWith(
         new CustomHTTPError(404, 'User posts not found'),
+      );
+    });
+  });
+
+  describe('When a request to add followers is made', () => {
+    const request = {
+      params: {
+        idUser: '123',
+      },
+      locals: {
+        id: '456',
+      },
+    } as Partial<
+      Request<RequestParamsUserId, unknown, unknown, unknown, UserLocalsId>
+    >;
+    const response = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+      locals: {
+        id: '456',
+      },
+    } as Partial<Response>;
+    test('Then the user should be added to the followers list', async () => {
+      UserModel.findOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue(null),
+      }));
+      UserModel.updateOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue({ modifiedCount: 1 }),
+      }));
+      await addFollowerController(
+        request as Request<
+          RequestParamsUserId,
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<unknown, UserLocalsId>,
+        next,
+      );
+
+      await expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('But the user is already in the followers list, then an error should be thrown', async () => {
+      UserModel.findOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue({}),
+      }));
+      await addFollowerController(
+        request as Request<
+          RequestParamsUserId,
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<unknown, UserLocalsId>,
+        next,
+      );
+
+      await expect(next).toHaveBeenCalledWith(
+        new CustomHTTPError(409, 'Already following'),
+      );
+    });
+
+    test('But there is an error while updating followers lists, then an error should be thrown', async () => {
+      UserModel.findOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue(null),
+      }));
+      UserModel.updateOne = jest.fn().mockImplementation(() => ({
+        exec: jest.fn().mockResolvedValue({ modifiedCount: 0 }),
+      }));
+      await addFollowerController(
+        request as Request<
+          RequestParamsUserId,
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<unknown, UserLocalsId>,
+        next,
+      );
+
+      await expect(next).toHaveBeenCalledWith(
+        new CustomHTTPError(500, 'Something went wrong'),
+      );
+    });
+
+    test('But the user is trying to follow himself, then an error should be thrown', async () => {
+      const sameUserRequest = {
+        params: {
+          idUser: '123',
+        },
+        locals: {
+          id: '123',
+        },
+      } as Partial<
+        Request<RequestParamsUserId, unknown, unknown, unknown, UserLocalsId>
+      >;
+      const sameUserResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+        locals: {
+          id: '123',
+        },
+      } as Partial<Response>;
+
+      await addFollowerController(
+        sameUserRequest as Request<
+          RequestParamsUserId,
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        sameUserResponse as Response<unknown, UserLocalsId>,
+        next,
+      );
+
+      await expect(next).toHaveBeenCalledWith(
+        new CustomHTTPError(409, 'Cannot follow yourself'),
       );
     });
   });
