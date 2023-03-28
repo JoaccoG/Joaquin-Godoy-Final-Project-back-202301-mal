@@ -128,39 +128,41 @@ export const addFollowerController: RequestHandler<
   }
 };
 
-// EditProfile.
-// =================
-// export const changeUserDataController: RequestHandler<
-//   RequestParamsUserId,
-//   unknown,
-//   { name: string; surname: string; biography: string }
-// > = async (req, res, next) => {
-//   const { idUser } = req.params;
-//   const { user } = res.locals.id;
-//   const { username, name, surname, biography, favGames } = req.body;
-//   const fileBuffer = req.file?.buffer;
-//   const fileName = `Avatar-${idUser}.webp`;
+export const removeFollowerController: RequestHandler<
+  RequestParamsUserId,
+  unknown,
+  unknown,
+  unknown,
+  UserLocalsId
+> = async (req, res, next) => {
+  const { idUser } = req.params;
+  const { id } = res.locals;
 
-//   try {
-//     const user = await UserModel.findOne({ _id: idUser }).exec();
+  try {
+    const notFollowing = await UserModel.findOne({
+      _id: id,
+      following: idUser,
+    }).exec();
+    if (notFollowing === null) {
+      throw new CustomHTTPError(409, 'Not following');
+    }
 
-//     if (user === null) {
-//       throw new CustomHTTPError(404, 'User not found');
-//     }
+    await UserModel.updateOne(
+      { _id: idUser },
+      { $pull: { followers: id } },
+    ).exec();
 
-//     if (user._id.toString() !== idUser) {
-//       throw new CustomHTTPError(403, 'Forbidden');
-//     }
+    await UserModel.updateOne(
+      { _id: id },
+      { $pull: { following: idUser } },
+    ).exec();
 
-//     user.name = name;
-//     user.surname = surname;
-//     user.username = username;
-//     user.biography = biography;
-
-//     await user.save();
-
-//     return res.status(200).json({ msg: 'Successfully updated user data!' });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+    return res.status(200).json({
+      msg: 'Successfully unfollowed user!',
+      removedFollower: idUser,
+      removedFollowing: id,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
