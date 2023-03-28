@@ -96,6 +96,10 @@ export const addFollowerController: RequestHandler<
   const { id } = res.locals;
 
   try {
+    if (idUser === id) {
+      throw new CustomHTTPError(409, 'Cannot follow yourself');
+    }
+
     const alreadyFollower = await UserModel.findOne({
       _id: id,
       following: idUser,
@@ -108,18 +112,16 @@ export const addFollowerController: RequestHandler<
       { _id: idUser },
       { $push: { followers: id } },
     ).exec();
-
     const newFollowing = await UserModel.updateOne(
       { _id: id },
       { $push: { following: idUser } },
     ).exec();
-
     if (newFollower.modifiedCount === 0 || newFollowing.modifiedCount === 0) {
       throw new CustomHTTPError(500, 'Something went wrong');
     }
 
     return res.status(200).json({
-      msg: 'Successfully followed user!',
+      msg: 'Successfully followed user',
       newFollower: idUser,
       newFollowing: id,
     });
@@ -144,7 +146,7 @@ export const removeFollowerController: RequestHandler<
       following: idUser,
     }).exec();
     if (notFollowing === null) {
-      throw new CustomHTTPError(409, 'Not following');
+      throw new CustomHTTPError(404, 'Not following');
     }
 
     await UserModel.updateOne(
@@ -158,7 +160,7 @@ export const removeFollowerController: RequestHandler<
     ).exec();
 
     return res.status(200).json({
-      msg: 'Successfully unfollowed user!',
+      msg: 'Successfully unfollowed user',
       removedFollower: idUser,
       removedFollowing: id,
     });
