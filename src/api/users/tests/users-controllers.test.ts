@@ -8,6 +8,7 @@ import {
 import {
   RequestParamsUserId,
   RequestQueryOffsetLimit,
+  UserLocalsId,
 } from '../../../types/models';
 import { CustomHTTPError } from '../../../errors/custom-http-error';
 import { PostModel } from '../../posts/posts-schema';
@@ -25,10 +26,18 @@ describe('Given the users entity controllers', () => {
       params: {
         idUser: '123456',
       },
-    } as Partial<Request<RequestParamsUserId>>;
+      locals: {
+        id: '123456',
+      },
+    } as Partial<
+      Request<RequestParamsUserId, unknown, unknown, unknown, UserLocalsId>
+    >;
     const response = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
+      locals: {
+        id: '123456',
+      },
     } as Partial<Response>;
 
     test('Then it should return the user data', async () => {
@@ -39,8 +48,14 @@ describe('Given the users entity controllers', () => {
       }));
 
       await getUserByIdController(
-        request as Request<RequestParamsUserId>,
-        response as Response,
+        request as Request<
+          RequestParamsUserId,
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<unknown, UserLocalsId>,
         next,
       );
       await expect(response.status).toHaveBeenCalledWith(200);
@@ -54,8 +69,14 @@ describe('Given the users entity controllers', () => {
       }));
 
       await getUserByIdController(
-        request as Request<RequestParamsUserId>,
-        response as Response,
+        request as Request<
+          RequestParamsUserId,
+          unknown,
+          unknown,
+          unknown,
+          UserLocalsId
+        >,
+        response as Response<unknown, UserLocalsId>,
         next,
       );
       await expect(next).toHaveBeenCalledWith(
