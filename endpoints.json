@@ -1,0 +1,323 @@
+{
+  "info": {
+    "_postman_id": "456e8474-1b2b-43e6-9209-b30bc7049ed1",
+    "name": "PlayersNation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "25665719"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Auth - Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"your-email@email.com\",\n    \"password\": \"your-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://joaquin-godoy-final-project-back-202301.onrender.com/auth/register",
+              "protocol": "https",
+              "host": [
+                "joaquin-godoy-final-project-back-202301",
+                "onrender",
+                "com"
+              ],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Auth - Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"your-email@email.com\",\n    \"password\": \"your-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://joaquin-godoy-final-project-back-202301.onrender.com/auth/login",
+              "protocol": "https",
+              "host": [
+                "joaquin-godoy-final-project-back-202301",
+                "onrender",
+                "com"
+              ],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "Posts - Get",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your_jwt_bearer_token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://joaquin-godoy-final-project-back-202301.onrender.com/api/v1/posts?offset=0&limit=4",
+              "protocol": "https",
+              "host": [
+                "joaquin-godoy-final-project-back-202301",
+                "onrender",
+                "com"
+              ],
+              "path": ["api", "v1", "posts"],
+              "query": [
+                {
+                  "key": "offset",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "4"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Posts - Create",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your_jwt_bearer_token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "game",
+                  "value": "Satisfactory",
+                  "type": "text"
+                },
+                {
+                  "key": "review",
+                  "value": "Awesome game",
+                  "type": "text"
+                },
+                {
+                  "key": "rating",
+                  "value": "5",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://joaquin-godoy-final-project-back-202301.onrender.com/api/v1/posts",
+              "protocol": "https",
+              "host": [
+                "joaquin-godoy-final-project-back-202301",
+                "onrender",
+                "com"
+              ],
+              "path": ["api", "v1", "posts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Posts - Delete",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your_jwt_bearer_token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "https://joaquin-godoy-final-project-back-202301.onrender.com/api/v1/posts/6418e741346809d59f272841",
+              "protocol": "https",
+              "host": [
+                "joaquin-godoy-final-project-back-202301",
+                "onrender",
+                "com"
+              ],
+              "path": ["api", "v1", "posts", "6418e741346809d59f272841"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Users - Get user by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your_jwt_bearer_token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://joaquin-godoy-final-project-back-202301.onrender.com/api/v1/users/64258e5c54685707cc59ef42",
+              "protocol": "https",
+              "host": [
+                "joaquin-godoy-final-project-back-202301",
+                "onrender",
+                "com"
+              ],
+              "path": ["api", "v1", "users", "64258e5c54685707cc59ef42"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Users - Get posts of user",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your_jwt_bearer_token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://joaquin-godoy-final-project-back-202301.onrender.com/api/v1/users/64258e5c54685707cc59ef42/posts",
+              "protocol": "https",
+              "host": [
+                "joaquin-godoy-final-project-back-202301",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "64258e5c54685707cc59ef42",
+                "posts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Users - Follow",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your_jwt_bearer_token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "https://joaquin-godoy-final-project-back-202301.onrender.com/api/v1/users/64130e36ff78a6209553ba40/followers",
+              "protocol": "https",
+              "host": [
+                "joaquin-godoy-final-project-back-202301",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "64130e36ff78a6209553ba40",
+                "followers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Users - Unfollow",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your_jwt_bearer_token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "https://joaquin-godoy-final-project-back-202301.onrender.com/api/v1/users/64130e36ff78a6209553ba40/followers",
+              "protocol": "https",
+              "host": [
+                "joaquin-godoy-final-project-back-202301",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "64130e36ff78a6209553ba40",
+                "followers"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
