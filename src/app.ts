@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.disable('x-powered-by');
 
 app.get('/', (_req, res) => {
-  res.json('Server ON');
+  res.json('Server ON!');
 });
 
 app.use('/auth', authRouter);
