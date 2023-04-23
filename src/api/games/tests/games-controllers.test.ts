@@ -2,7 +2,10 @@ import { Request, Response } from 'express';
 import { RequestQueryOffsetLimit } from '../../../types/models';
 import { GameModel } from '../games-schema';
 import { mockedGames } from './utils';
-import { getGamesController } from '../games-controllers';
+import {
+  getGamesController,
+  getGameByIdController,
+} from '../games-controllers';
 
 describe('Given the games entity controllers', () => {
   const next = jest.fn();
@@ -45,6 +48,42 @@ describe('Given the games entity controllers', () => {
         next,
       );
       await expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe('When a request to get one game is made', () => {
+    const request = {
+      params: { idGame: 'game1' },
+    } as Partial<Request<{ idGame: string }>>;
+    const response = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    } as Partial<Response>;
+    GameModel.findOne = jest.fn().mockReturnValue({
+      populate: jest.fn().mockReturnThis(),
+      exec: jest.fn().mockResolvedValue(mockedGames[0]),
+    });
+
+    test('Then the response should be a 200', async () => {
+      await getGameByIdController(
+        request as Request<{ idGame: string }>,
+        response as Response,
+        next,
+      );
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('But the game is not found, then it should throw an error', async () => {
+      GameModel.findOne = jest.fn().mockReturnValue({
+        populate: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(null),
+      });
+      await getGameByIdController(
+        request as Request<{ idGame: string }>,
+        response as Response,
+        next,
+      );
+      expect(next).toHaveBeenCalled();
     });
   });
 });
