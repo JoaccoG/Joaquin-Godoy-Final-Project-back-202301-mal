@@ -29,7 +29,7 @@ describe('Given a route that needs authentication', () => {
   describe('When the user is authenticated', () => {
     test('Then it should be allowed to use the path', async () => {
       await request(app)
-        .get('/api/v1/posts')
+        .get('/api/v1/posts?limit=4&offset=0')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
     });
