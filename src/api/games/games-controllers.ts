@@ -37,3 +37,28 @@ export const getGamesController: RequestHandler<
     next(err);
   }
 };
+
+export const getGameByIdController: RequestHandler<{
+  idGame: string;
+}> = async (req, res, next) => {
+  const { idGame } = req.params;
+
+  try {
+    const gameData = await GameModel.findOne({ _id: idGame })
+      .populate({
+        path: 'posts',
+        options: { sort: { date: -1 }, limit: 3 },
+      })
+      .exec();
+
+    if (!gameData) {
+      throw new CustomHTTPError(404, 'Game not found');
+    }
+
+    return res
+      .status(200)
+      .json({ msg: 'Successfully fetched game!', gameData });
+  } catch (err) {
+    next(err);
+  }
+};
