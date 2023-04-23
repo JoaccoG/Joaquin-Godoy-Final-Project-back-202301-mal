@@ -16,6 +16,13 @@ export const getAllPostsController: RequestHandler<
   const { offset, limit } = req.query;
 
   try {
+    if (!limit || limit > 10) {
+      throw new CustomHTTPError(
+        400,
+        'Query parameter "limit" is missing or is greater than 10',
+      );
+    }
+
     const postsCount = await PostModel.countDocuments().exec();
 
     const posts = await PostModel.find({})
