@@ -211,10 +211,10 @@ describe('Given the posts entity controllers', () => {
       await expect(response.status).toHaveBeenCalledWith(200);
     });
 
-    test('But there is an error while finding the posts, then an error should be thrown', async () => {
-      PostModel.find = jest.fn().mockReturnValue({
-        exec: jest.fn().mockRejectedValue(new Error('mockedError')),
-      });
+    test('But the limit query param is greater than 10, then an error should be thrown', async () => {
+      const request = {
+        query: { offset: 0, limit: 11 },
+      } as Partial<Request<unknown, unknown, unknown, RequestQueryOffsetLimit>>;
 
       await getAllPostsController(
         request as Request<unknown, unknown, unknown, RequestQueryOffsetLimit>,
